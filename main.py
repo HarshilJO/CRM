@@ -85,3 +85,4 @@ async def get_application(id: int, db: Session = Depends(get_db)):
     if not application:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Application Not Found")
     return application
+
