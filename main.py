@@ -1,15 +1,20 @@
 from fastapi import FastAPI, Depends, HTTPException, status
 from app import models, schemas
+from address import model, schema
 from app.database import engine, SessionLocal
+from address.database import engines, SessionLocals
 from sqlalchemy.orm import Session
 import re
+from fastapi.responses import JSONResponse
+import json
 
 app = FastAPI()
 #TO run this code:
-#Use~~ uvicorn myapp:app --host 26.243.124.232 --port 8080 --reload 
+#Use~~ uvicorn main:app --host 26.243.124.232 --port 8080 --reload 
+#To See the output use this link : http://26.243.124.232:8080/docs#/default/
 # Create database tables
 models.Base.metadata.create_all(engine)
-
+model.Base.metadata.create_all(engine)
 # Dependency to get database session
 def get_db():
     db = SessionLocal()
@@ -17,7 +22,12 @@ def get_db():
         yield db
     finally:
         db.close()
-
+def gets_db():
+    db = SessionLocals()
+    try:
+        yield db
+    finally:
+        db.close()
 # admin authentication
 @app.post("/admin")
 async def check_admin(request: schemas.admin, db: Session = Depends(get_db)):
@@ -77,12 +87,4 @@ async def delete_user(id: int, db: Session = Depends(get_db)):
 async def get_all_applications(db: Session = Depends(get_db)):
     applications = db.query(models.Application).all()
     return applications
-
-# Get application by id
-@app.get("/application/{id}")
-async def get_application(id: int, db: Session = Depends(get_db)):
-    application = db.query(models.Application).filter(models.Application.id == id).first()
-    if not application:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Application Not Found")
-    return application
 

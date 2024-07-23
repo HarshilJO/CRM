@@ -34,7 +34,7 @@ class application(Base):
     university_name=Column(String)
     intake=Column(String)
     program=Column(String)
-    application=relationship("user",back_populates="user")
+    applications=relationship("user",back_populates="user")
 
 # class agent(Base):
 #      __tablename__ = 'agents'

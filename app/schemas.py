@@ -15,7 +15,8 @@ class user(BaseModel):
     pass_Expiry:str
     agent:str
     single:str
-
+class Country(BaseModel):
+    name: str
 class application(BaseModel):
     student_id:int
     university_name:str
