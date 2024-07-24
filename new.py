@@ -1,6 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 import json
 
 app = FastAPI()
@@ -18,9 +18,22 @@ class Country(BaseModel):
     id: int
     name: str
 
-@app.get("/countries" )
+class State(BaseModel):
+    id: int
+    name: str
+    
+
+@app.get("/countries")
 def get_countries():
-    # raw_dump=
-    return {'status':200,'data':[{"id":country["id"],"name": country["name"]} for country in data],'message':'Success'}
-    # [{"id":country["id"],"name": country["name"]} for country in data]
+    return {'status': 200, 'data': [{"id": country["id"], "name": country["name"]} for country in data], 'message': 'Success'}
+
+@app.get("/countries/{country_id}/states")
+def get_states(country_id: int):
+    for country in data:
+        if country["id"] == country_id:
+            if "states" in country:
+                return {'status': 200, 'data': [{"id": state["id"], "name": state["name"]} for state in country["states"]], 'message': 'Success'}
+            else:
+                return {'status': 404, 'data': [], 'message': 'No states found for this country'}
+    raise HTTPException(status_code=404, detail="Country not found")
 
